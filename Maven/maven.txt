@@ -1,0 +1,383 @@
+
+About
+	Apache Maven
+		是一套软件工程管理和整合工具。基于工程对象模型（POM）的概念，通过一个中央信息管理模块，Maven能够管理项目的构建、报告和文档。
+
+Maven核心概念：
+
+	POM (Project Object Model)
+	Maven 插件
+	Maven 生命周期
+	Maven 依赖管理
+	Maven 库
+
+Summary
+	Maven为开发者提供了一套完整的构建生命周期框架。开发团队几乎不用花多少时间就能够自动完成工程的基础构建配置，因为Maven 使用了一个标准的目录结构和一个默认的构建生命周期。
+
+	Maven 能够帮助开发者完成以下工作：
+		构建
+		文档生成
+		报告
+		依赖
+		SCMs
+		发布
+		分发
+		邮件列表
+
+	Maven 的目标
+		Maven 的主要目的是为开发者提供
+		
+			一个可复用、可维护、更易理解的工程综合模型
+			与这个模型交互的插件或者工具
+
+	约定优于配置
+
+		Maven 使用约定而不是配置，意味着开发者不需要再自己创建构建过程。
+
+		为了构建工程，Maven为开发者提供了选项来配置生命周期目标和工程依赖（依赖于 Maven的插件扩展功能和默认的约定）。大部分的工程管理和构建相关的任务是由 Maven插件完成的。
+
+	Maven - 环境配置
+		export M2_HOME=/usr/local/apache-maven/apache-maven-3.2.5
+		export M2=$M2_HOME/bin
+		export MAVEN_OPTS=-Xms256m -Xmx512m
+
+Maven - POM
+
+	POM 代表工程对象模型。它是使用 Maven 工作时的基本组建，是一个 xml文件。它被放在工程根目录下，文件命名为 pom.xml。
+	POM 包含了关于工程和各种配置细节的信息，Maven 使用这些信息构建工程。
+	POM 也包含了目标和插件。当执行一个任务或者目标时，Maven 会查找当前目录下的POM，从其中读取所需要的配置信息，然后执行目标。能够在 POM中设置的一些配置如下：
+		project dependencies
+		plugins
+		goals
+		build profiles
+		project version
+		developers
+		mailing list
+
+	在创建 POM之前，我们首先确定工程组（groupId），及其名称（artifactId）和版本，在仓库中这些属性是工程的唯一标识。
+
+	POM 举例
+		<project xmlns="http://maven.apache.org/POM/4.0.0"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+				http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+			<modelVersion>4.0.0</modelVersion>
+			<groupId>com.companyname.project-group</groupId>
+			<artifactId>project</artifactId>
+			<version>1.0</version>
+		</project>
+
+	Super POM
+
+		所有的 POM 都继承自一个父 POM（无论是否显式定义了这个父 POM）。父 POM 也被称作Super POM，它包含了一些可以被继承的默认设置。
+		Maven 使用 effective pom（Super pom加上工程自己的配置）来执行相关的目标，它帮助开发者在 pom.xml中做尽可能少的配置，当然这些配置可以被方便的重写。
+		查看 Super POM 默认配置的一个简单方法是执行以下命令：mvn help:effective-pom
+
+Maven - 构建生命周期
+
+	什么是构建生命周期
+		构建生命周期是一组阶段的序列（sequence ofphases），每个阶段定义了目标被执行的顺序。这里的阶段是生命周期的一部分。
+
+	prepare-resources  -->  compile -->  package  -->  install
+
+	目标表示一个特定的、对构建和管理工程有帮助的任务。它可能绑定了0个或多个构建阶段。没有绑定任何构建阶段的目标可以在构建生命周期之外被直接调用执行。
+	mvn clean dependency:copy-dependencies package
+
+Default (or Build) 生命周期
+
+	Maven 的主要生命周期，被用于构建应用。包括下面的 23 个阶段。
+
+	validate
+	initialize
+	generate-sources
+	process-sources
+	generate-resources
+	compile
+	process-classes
+	generate-test-sources
+	test-compile
+	process-test-classes
+	test
+	prepare-package
+	package
+	pre-integration-test
+	integration-test
+	post-integration-test
+	verify
+	install
+	deploy
+
+	当一个阶段通过 Maven 命令调用时，例如 mvn compile，只有该阶段之前以及包括该阶段在内的所有阶段会被执行。
+	
+Site 生命周期
+
+	Maven Site 插件一般用来创建新的报告文档、部署站点等。
+
+Maven - 构建配置文件
+
+	构建配置文件是一组配置的集合，用来设置或者覆盖 Maven构建的默认配置。使用构建配置文件，可以为不同的环境定制构建过程，例如Producation 和 Development 环境。
+
+	Profile 在 pom.xml 中使用 activeProfiles / profiles元素指定，并且可以用很多方式触发。Profile 在构建时修改POM，并且为变量设置不同的目标环境（例如，在开发、测试和产品环境中的数据库服务器路径）。
+
+	Profile 类型
+
+	Profile 主要有三种类型。
+	类型 	在哪里定义
+	Per Project 	定义在工程 POM 文件 pom.xml 中
+	Per User 	定义在 Maven 设置 xml 文件中 （%USER_HOME%/.m2/settings.xml）
+	Global 		定义在 Maven 全局配置 xml 文件中 （%M2_HOME%/conf/settings.xml）
+
+	Profile 激活
+
+		Maven 的 Profile 能够通过几种不同的方式激活。
+
+		显式使用命令控制台输入
+		通过 maven 设置
+		基于环境变量（用户 / 系统变量）
+		操作系统配置（例如，Windows family）
+		现存 / 缺失 文件
+
+Maven - 仓库
+	在 Maven 的术语中，仓库是一个位置（place），例如目录，可以存储所有的工程 jar文件、library jar 文件、插件或任何其他的工程指定的文件。
+
+	Maven 仓库有三种类型：
+
+		本地（local）
+		中央（central）
+		远程（remote）
+
+本地仓库
+
+	Maven 本地仓库是机器上的一个文件夹。它在你第一次运行任何 maven命令的时候创建。
+	Maven 本地仓库保存你的工程的所有依赖（library jar、plugin jar等）。当你运行一次 Maven 构建，Maven 会自动下载所有依赖的 jar文件到本地仓库中。它避免了每次构建时都引用存放在远程机器上的依赖文件。
+
+	Maven 本地仓库默认被创建在 %USER_HOME% 目录下。要修改默认位置，在%M2_HOME%\conf 目录中的 Maven 的 settings.xml 文件中定义另一个路径。
+
+中央仓库
+
+	Maven 中央仓库是由 Maven 社区提供的仓库，其中包含了大量常用的库。
+
+	中央仓库的关键概念：
+
+		这个仓库由 Maven 社区管理。
+		不需要配置。
+		需要通过网络才能访问。
+
+要浏览中央仓库的内容，maven 社区提供了一个
+URL：http://search.maven.org/#browse。使用这个仓库，开发人员可以搜索所有可以获取的代码库。
+
+
+远程仓库
+
+	如果 Maven在中央仓库中也找不到依赖的库文件，它会停止构建过程并输出错误信息到控制台。为避免这种情况，Maven提供了远程仓库的概念，它是开发人员自己定制仓库，包含了所需要的代码库或者其他工程中用到的
+jar 文件。
+
+Maven 依赖搜索顺序
+
+	当我们执行 Maven 构建命令时，Maven 开始按照以下顺序查找依赖的库：
+
+	步骤 1 － 在本地仓库中搜索，如果找不到，执行步骤2，如果找到了则执行其他操作。
+	步骤 2 － 在中央仓库中搜索，如果找不到，并且有一个或多个远程仓库已经设置，则执行步骤4，如果找到了则下载到本地仓库中已被将来引用。
+	步骤 3 － 如果远程仓库没有被设置，Maven将简单的停滞处理并抛出错误（无法找到依赖的文件）。
+	步骤 4 － 在一个或多个远程仓库中搜索依赖的文件，如果找到则下载到本地仓库已被将来引用，否则Maven 将停止处理并抛出错误（无法找到依赖的文件）。
+
+Maven - 插件
+
+	Maven 实际上是一个依赖插件执行的框架，每个任务实际上是由插件完成。Maven插件通常被用来：
+
+		创建 jar 文件
+		创建 war 文件
+		编译代码文件
+		代码单元测试
+		创建工程文档
+		创建工程报告
+
+	插件通常提供了一个目标的集合，并且可以使用下面的语法执行：
+
+	mvn [plugin-name]:[goal-name]
+	
+插件类型
+
+	Maven 提供了下面两种类型的插件：
+	类型 			描述
+	Build plugins 		在构建时执行，并在 pom.xml 的 元素中配置。
+	Reporting plugins 	在网站生成过程中执行，并在 pom.xml 的 元素中配置。
+
+
+Maven - 创建工程
+
+	Maven 使用原型（archetype）插件创建工程。要创建一个简单的 Java应用，我们将使用 maven-archetype-quickstart 插件。
+
+Maven - 工程模板
+
+	Maven 使用原型（Archetype）概念为用户提供了大量不同类型的工程模版（614个）。Maven 使用下面的命令帮助用户快速创建 java 项目。
+
+	mvn archetype:generate
+
+	什么是原型？
+
+	原型是一个 Maven 插件，它的任务是根据模板创建一个项目结构。我们将使用quickstart 原型插件创建一个简单的 java 应用程序。
+
+Maven - 外部依赖
+
+	如果在远程仓库和中央仓库中，依赖不能被满足，如何解决呢? Maven使用外部依赖的概念来解决这个问题。
+
+
+Maven - 工程文档
+	
+	[root@localhost mv]# mvn site
+
+	Maven 使用称作 Doxia的文件处理引擎创建文档，它将多个源格式的文件转换为一个共通的文档模型。要编写工程文档，你可以使用以下能够被Doxia 解析的几种常用格式来编写。
+
+	格式名称 	描述 			引用
+	XDoc 	Maven 1.x 版本的文档格式	http://jakarta.apache.org/site/jakarta-site2.html
+	FML 	FAQ 文档格式			http://maven.apache.org/doxia/references/fml-format.html
+	XHTML 	可扩展 HTML 格式 		http://en.wikipedia.org/wiki/XHTML
+
+
+Maven - 快照
+
+	大型软件应用程序通常由多个模块组成，这是多个团队工作于同一应用程序的不同模块的常见场景。例如一个团队工作负责应用程序的前端应用用户接口工程（app-ui.jar:1.0)），同时他们使用数据服务工程（data-service.jar:1.0）。
+
+	现在负责数据服务的团队可能正在进行修正 bug或者增强功能，并快速迭代，然后他们几乎每天都会 release工程库文件到远程仓库中。
+
+	现在如果数据服务团队每天上传新的版本，那么就会有下面的问题：
+
+		每次数据服务团队发布了一版更新的代码时，都要告诉应用接口团队。
+		应用接口团队需要定期更新他们的 pom.xml 来得到更新的版本
+
+	为了解决这样的情况，快照概念发挥了作用.
+
+	什么是快照？
+
+		快照是一个特殊的版本，它表示当前开发的一个副本。与常规版本不同，Maven为每一次构建从远程仓库中检出一份新的快照版本。
+		现在数据服务团队会将每次更新的代码的快照（例如data-service:1.0-SNAPSHOT）发布到仓库中，来替换旧的快照 jar 文件。
+
+	快照 vs 版本
+
+		对于版本，Maven 一旦下载了指定的版本（例如data-service:1.0），它将不会尝试从仓库里再次下载一个新的 1.0版本。想要下载新的代码，数据服务版本需要被升级到 1.1。
+		对于快照，每次用户接口团队构建他们的项目时，Maven将自动获取最新的快照（data-service:1.0-SNAPSHOT）。
+
+
+Maven - 构建自动化
+
+	构建自动化定义为一种场景：一旦该工程成功构建完成，其相关的依赖工程即开始构建，目的是为了保证其依赖项目的稳定。
+
+实例
+	
+	考虑一个团队正在开发一个关于总线核心 Api（称其为bus-core-api）的工程，依赖它的工程有 2 个，分别为网页 UI（称其为app-web-ui）和应用程序桌面 UI（称其为 app-desktop-ui）。
+
+	现在，app-web-ui 和 app-desktop-ui 工程的团队需要保证当 bus-core-api工程有变化时他们自己相应的工程可以随时被构建。
+
+	使用快照可以保证最新的 bus-core-api工程可以被使用，但是为了达到上述的需求，我们仍需做一些额外的工作。
+
+	我们有 2 种方式：
+
+		在 bus-core-api 的 pom 文件里添加一个编译目标来提醒 app-web-ui 工程和app-desktop-ui 工程启动创建。
+		使用一个持续集成（CI）的服务器，比如 Hudson，来实现自动化创建。
+
+Maven - 依赖管理
+
+Maven
+	核心特点之一是依赖管理。一旦我们开始处理多模块工程（包含数百个子模块或者子工程）的时候，模块间的依赖关系就变得非常复杂，管理也变得很困难。针对此种情形，Maven提供了一种高度控制的方法。
+
+传递依赖发现
+
+	这种情形经常可见，当一个库 A 依赖于其他库 B. 另一工程 C 想要使用库 A,那么该工程同样也需要使用到库 B。
+	Maven可以避免去搜索所有需要的库资源的这种需求。通过读取工程文件（pom.xml）中的依赖项，Maven可以找出工程之间的依赖关系。
+	我们只需要在每个工程的 pom 文件里去定义直接的依赖关系。Maven则会自动的来接管后续的工作。
+	通过传递依赖，所有被包含的库的图形可能会快速的增长。当重复的库存在时，可能出现的情形将会持续上升。Maven提供一些功能来控制可传递的依赖的程度。
+
+依赖管理
+
+	通常情况下，在一个共通的工程下，有一系列的工程。在这种情况下，我们可以创建一个公共依赖的pom 文件，该 pom 包含所有的公共的依赖关系，我们称其为其他子工程 pom 的 pom父。
+
+Maven - 自动化部署
+
+	一般情况下，在一个工程开发进程里，一次部署的过程包含需如下步骤：
+
+		合入每个子工程下的代码到 SVN 或者源代码库，并标记它。
+		从 SVN 下载完整的源代码。
+		构建应用程序。
+		保存构建结果为 WAR 或者 EAR 类型文件并存放到一个共同的指定的网络位置上。
+		从网络上获得该文件并且部署该文件到产品线上。
+		更新文档日期和应用程序的版本号。
+
+	通过结合如下的方案来实现自动化部署：
+
+		Maven 构建和发布项目，
+		SubVersion, 源代码库用以管理源代码，
+		远程仓库管理工具 (Jfrog/Nexus) 用以管理工程的二进制文件。
+
+
+	更新工程的 POM.xml
+
+		我们将会使用 Maven 发布的插件来创建一个自动化发布过程
+
+		在 pom.xml 里，我们常常会使用到的重要元素如下表：
+		元素 	描述
+		SCM 	配置 SVN 的路径，Maven 将从该路径下将代码取下来。
+		仓库 	成功构建出来的 WAR/EAR/JAR 或者其他的构建结果存放的路径。
+		插件 	maven-release-plugin 用以自动化部署的过程。
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+   http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>bus-core-api</groupId>
+   <artifactId>bus-core-api</artifactId>
+   <version>1.0-SNAPSHOT</version>
+   <packaging>jar</packaging> 
+   <scm>
+      <url>http://www.svn.com</url>
+      <connection>scm:svn:http://localhost:8080/svn/jrepo/trunk/
+      Framework</connection>
+      <developerConnection>scm:svn:${username}/${password}@localhost:8080:common_core_api:1101:code</developerConnection>
+   </scm>
+   <distributionManagement>
+      <repository>
+         <id>Core-API-Java-Release</id>
+         <name>Release repository</name>
+         <url>http://localhost:8081/nexus/content/repositories/Core-Api-Release</url>
+      </repository>
+   </distributionManagement>
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.0-beta-9</version>
+            <configuration>
+               <useReleaseProfile>false</useReleaseProfile>
+               <goals>deploy</goals>
+               <scmCommentPrefix>[bus-core-api-release-checkin]-</scmCommentPrefix>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+</project>
+
+
+Maven - Web 应用
+
+	创建 Web 应用
+		建立一个简单的 Java web 应用，我们可以使用maven-archetype-webapp 插件。
+		mvn archetype:generate -DgroupId=com.companyname.automobile -DartifactId=trucks -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+
+		Maven 使用一个标准的目录架构，如上示例，我们可以理解以下的关键概念：
+		文件夹结构 			描述
+		trucks 				包含 src 文件夹和 pom.xml
+		src/main/webapp 		包含 index.jsp 和 WEB-INF 文件夹.
+		src/main/webapp/WEB-INF 	包含 web.xml
+		src/main/resources 		包含 images / properties 文件。
+
+	Build Web Application
+
+		mvn clean package
+
+	部署 Web 应用
+
+		现在拷贝在target文件夹下的*.war到你的 web 服务器的 webapp 目录下，并且重启 web 服务。
