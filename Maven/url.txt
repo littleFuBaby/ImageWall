@@ -1,2 +1,0 @@
-maven入门学习
-http://wiki.jikexueyuan.com/project/maven/
