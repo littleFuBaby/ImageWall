@@ -20,7 +20,7 @@ public class TestRedisPool {
 		final String PASSWORD = "fuys0822";
 		final int TIMEOUT = 1000;
 		final int MAX_TOTAL = 1000;
-		final int MAX_IDLE = 300;
+		final int MAX_IDLE = 400;
 		final long MAX_WAIT_MILLIS = 1000;
 		final boolean TEST_ON_BORROW = true;
 		logger.info("Configure Redis Pool -->");
