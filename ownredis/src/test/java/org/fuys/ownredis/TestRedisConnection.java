@@ -12,7 +12,7 @@ public class TestRedisConnection {
 
 	@Test
 	public void test() {
-		final String HOST = "192.168.6.128";
+		String HOST = "192.168.6.128";
 		final int PORT = 6379;
 		final String PASSWORD = "fuys0822";
 		final int TIMEOUT = 1000;
